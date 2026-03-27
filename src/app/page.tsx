@@ -61,32 +61,56 @@ export default function Home() {
     }, 600);
   }, []);
 
+  const handleNext = useCallback(() => {
+    if (!canScroll) return;
+
+    if (currentDriverIndex < DRIVERS.length - 1) {
+      // Move to next driver
+      setCanScroll(false);
+      setPhase("intro");
+      setTimeout(() => {
+        setCurrentDriverIndex((prev) => prev + 1);
+        setPhase("car-enters");
+      }, 2500);
+    } else if (phase === "driver-reveal") {
+      // Move to gallery
+      setCanScroll(false);
+      setPhase("gallery");
+      // Allow normal page scrolling for the gallery
+      document.body.style.overflow = "auto";
+    }
+  }, [canScroll, currentDriverIndex, phase]);
+
   useEffect(() => {
-    const handleScroll = (e: WheelEvent) => {
-      if (!canScroll) return;
-      
+    const handleWheel = (e: WheelEvent) => {
       if (e.deltaY > 50) {
-        if (currentDriverIndex < DRIVERS.length - 1) {
-          // Move to next driver
-          setCanScroll(false);
-          setPhase("intro");
-          setTimeout(() => {
-            setCurrentDriverIndex((prev) => prev + 1);
-            setPhase("car-enters");
-          }, 2500);
-        } else if (phase === "driver-reveal") {
-          // Move to gallery
-          setCanScroll(false);
-          setPhase("gallery");
-          // Allow normal page scrolling for the gallery
-          document.body.style.overflow = "auto";
-        }
+        handleNext();
       }
     };
 
-    window.addEventListener("wheel", handleScroll);
-    return () => window.removeEventListener("wheel", handleScroll);
-  }, [canScroll, currentDriverIndex, phase]);
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaY = touchStartY - touchEndY; // Positive means swiped up
+      if (deltaY > 50) {
+        handleNext();
+      }
+    };
+
+    window.addEventListener("wheel", handleWheel);
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [handleNext]);
 
   const carPhaseVisible = phase === "car-enters" || phase === "car-stops";
   const driverVisible = phase === "driver-reveal";

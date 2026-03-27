@@ -122,8 +122,13 @@ export default function SoundManager({ muted, phase }: SoundManagerProps) {
   useEffect(() => {
     if (muted) {
       stopEngine();
+    } else {
+      const ctx = getCtx();
+      if (ctx.state === "suspended") {
+        ctx.resume();
+      }
     }
-  }, [muted, stopEngine]);
+  }, [muted, stopEngine, getCtx]);
 
   return null;
 }
