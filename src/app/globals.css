@@ -1,0 +1,707 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --white: #ffffff;
+  --off-white: #f8f8f8;
+  --light-gray: #f0f0f0;
+  --border: #e0e0e0;
+  --text-dark: #0a0a0a;
+  --text-mid: #444444;
+  --text-light: #888888;
+  --ferrari-red: #dc0000;
+  --ferrari-red-dark: #a00000;
+  --ferrari-red-light: #ff2020;
+  --accent-yellow: #ffd700;
+  --shadow: rgba(0,0,0,0.07);
+  --shadow-md: rgba(0,0,0,0.13);
+}
+
+html, body {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: var(--white);
+  color: var(--text-dark);
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===================== BACKGROUND ===================== */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  z-index: 0;
+}
+
+/* Subtle grid lines — like a racing data overlay */
+.page-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.022) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* ===================== TRACK STRIP ===================== */
+.track-strip {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 26%;
+  background: linear-gradient(to bottom, #f3f3f3, #e8e8e8);
+  border-top: 2px solid #ddd;
+  z-index: 1;
+}
+
+/* Thin red accent line on the track */
+.track-strip::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--ferrari-red);
+}
+
+/* Dashed center line */
+.track-center-line {
+  position: fixed;
+  bottom: 13%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0,0,0,0.12) 0px,
+    rgba(0,0,0,0.12) 40px,
+    transparent 40px,
+    transparent 80px
+  );
+  z-index: 2;
+}
+
+/* ===================== MUTE BUTTON ===================== */
+.mute-btn {
+  position: fixed;
+  top: 24px;
+  right: 28px;
+  z-index: 999;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--border);
+  color: var(--text-dark);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 9px 16px;
+  border-radius: 100px;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 12px var(--shadow);
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+.mute-btn:hover {
+  background: var(--ferrari-red);
+  color: #fff;
+  border-color: var(--ferrari-red);
+}
+
+/* ===================== RACING LIGHTS ===================== */
+.lights-container {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.race-light {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  border: 2px solid #444;
+  transition: background 0.08s ease, box-shadow 0.08s ease, border-color 0.08s ease;
+}
+
+.race-light.lit {
+  background: var(--ferrari-red);
+  border-color: var(--ferrari-red-dark);
+  box-shadow: 0 0 16px rgba(220,0,0,0.7), 0 0 36px rgba(220,0,0,0.3);
+}
+
+/* ===================== DRIVER REVEAL ===================== */
+.driver-section {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  pointer-events: none;
+  padding: 20px;
+}
+
+.driver-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(24px, 3vw, 40px);
+  padding: clamp(32px, 4vw, 56px) clamp(24px, 5vw, 64px);
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 4px;
+  border-top: 4px solid var(--ferrari-red);
+  box-shadow:
+    0 32px 100px rgba(0,0,0,0.1),
+    0 4px 24px rgba(0,0,0,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+  max-width: min(820px, 90vw);
+  width: 100%;
+  backdrop-filter: blur(24px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Remove the left border accent for the centered layout to maintain symmetry */
+.driver-card::before {
+  display: none;
+}
+
+.driver-img-wrap {
+  flex: 0 0 auto;
+  width: clamp(160px, 25vw, 320px);
+  height: clamp(180px, 28vw, 360px);
+  overflow: visible;
+  background: transparent;
+  position: relative;
+}
+
+.driver-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  display: block;
+  mix-blend-mode: multiply;
+  filter: contrast(1.05) brightness(1.05);
+}
+
+.driver-text-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.driver-eyebrow {
+  font-size: clamp(0.6rem, 1.1vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ferrari-red);
+}
+
+.driver-name {
+  font-size: clamp(1.9rem, 4.5vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  color: var(--text-dark);
+}
+
+.driver-birthday {
+  font-size: clamp(1.5rem, 3.5vw, 2.8rem);
+  font-weight: 700;
+  color: var(--ferrari-red);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.driver-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: clamp(0.65rem, 1.2vw, 0.8rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+.driver-flag::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 2px;
+  background: var(--ferrari-red);
+  flex-shrink: 0;
+}
+
+/* ===================== REPLAY BUTTON ===================== */
+.replay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--text-dark);
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  padding: 12px 28px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.replay-btn:hover {
+  background: var(--ferrari-red);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(220,0,0,0.25);
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 540px) {
+  .driver-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 28px 20px;
+  }
+
+  .driver-flag {
+    justify-content: center;
+  }
+
+  .driver-flag::before {
+    display: none;
+  }
+
+  .driver-img-wrap {
+    width: clamp(120px, 45vw, 180px);
+    height: clamp(140px, 52vw, 210px);
+  }
+}
+
+/* ===================== GALLERY SECTION ===================== */
+.gallery-container {
+  position: relative;
+  max-width: 1000px;
+  margin: 100px auto;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+}
+
+.gallery-header {
+  text-align: center;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.gallery-eyebrow {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ferrari-red);
+  margin-bottom: 8px;
+}
+
+.gallery-birthdate {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 900;
+  color: var(--text-dark);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.header-line {
+  width: 60px;
+  height: 4px;
+  background: var(--ferrari-red);
+  margin: 24px auto 0;
+  border-radius: 2px;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  top: 260px;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, #eee 10%, #eee 90%, transparent);
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+.gallery-item {
+  position: relative;
+  width: 45%;
+  z-index: 1;
+}
+
+.gallery-item.left {
+  align-self: flex-start;
+  text-align: right;
+}
+
+.gallery-item.right {
+  align-self: flex-end;
+  text-align: left;
+}
+
+.photo-card {
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.02);
+  transition: transform 0.3s ease;
+}
+
+.photo-card:hover {
+  transform: translateY(-5px);
+}
+
+.photo-img-container {
+  width: 100%;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f9f9f9;
+}
+
+.gallery-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-caption {
+  margin-top: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  letter-spacing: -0.01em;
+}
+
+.timeline-dot {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  background: #dc0000;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(220, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.gallery-item.left .timeline-dot {
+  right: -5.5%;
+  transform: translate(50%, -50%);
+}
+
+.gallery-item.right .timeline-dot {
+  left: -5.5%;
+  transform: translate(-50%, -50%);
+}
+
+/* ===================== WISHES SECTION ===================== */
+.wishes-view {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  overflow: hidden;
+  text-align: center;
+  padding: 40px;
+}
+
+.wishes-content {
+  position: relative;
+  z-index: 10;
+  max-width: 800px;
+}
+
+.wishes-title {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 900;
+  color: #1a1a1a;
+  letter-spacing: -0.03em;
+  margin-bottom: 24px;
+}
+
+.wishes-text {
+  font-size: clamp(1.1rem, 2vw, 1.8rem);
+  font-weight: 500;
+  color: #666;
+  line-height: 1.6;
+}
+
+.sparkle-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 1.5rem;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .timeline-line {
+    left: 20px;
+  }
+  .gallery-item {
+    width: calc(100% - 60px);
+    align-self: flex-end !important;
+    text-align: left !important;
+  }
+  .gallery-item.left .timeline-dot,
+  .gallery-item.right .timeline-dot {
+    left: -40px;
+  }
+}
+
+/* ===================== CAKE SECTION ===================== */
+.cake-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 60px;
+  position: relative;
+  z-index: 10;
+}
+
+.cake-wrapper {
+  position: relative;
+  width: 240px;
+  height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Candle */
+.candle-system {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.candle-stick {
+  width: 14px;
+  height: 54px;
+  background: white;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 2px 0 5px rgba(0,0,0,0.1), 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.candle-stripes {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 12px,
+    var(--ferrari-red) 12px,
+    var(--ferrari-red) 24px
+  );
+  opacity: 0.9;
+}
+
+.flame {
+  width: 18px;
+  height: 30px;
+  background: #ffcc00;
+  border-radius: 50% 50% 20% 20%;
+  margin-bottom: 2px;
+  box-shadow: 
+    0 0 15px #ff9900,
+    0 0 30px rgba(255, 153, 0, 0.4);
+  background: linear-gradient(to bottom, #fff700, #ff6600);
+}
+
+/* Cake Body */
+.cake-body {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cake-layer.chocolate {
+  position: relative;
+  width: 100%;
+  background: #3d2b1f; /* Dark Chocolate */
+  background: linear-gradient(to right, #3d2b1f, #5c4033, #3d2b1f);
+  border: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2), inset 0 2px 5px rgba(255,255,255,0.05);
+  overflow: visible;
+}
+
+.cake-layer.top {
+  width: 160px;
+  height: 70px;
+  border-radius: 16px 16px 4px 4px;
+  z-index: 5;
+}
+
+.cake-layer.bottom {
+  width: 220px;
+  height: 100px;
+  border-radius: 12px 12px 4px 4px;
+  margin-top: -6px;
+  z-index: 2;
+}
+
+.chocolate-drip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 24px;
+  background: #2a1b12; /* Rich Ganache */
+  border-radius: 16px 16px 4px 4px / 16px 16px 12px 12px;
+  z-index: 2;
+}
+
+/* Ganache Drips */
+.chocolate-drip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: #2a1b12;
+  mask-image: radial-gradient(circle at 12.5% 100%, black 6px, transparent 6px),
+              radial-gradient(circle at 37.5% 100%, black 10px, transparent 10px),
+              radial-gradient(circle at 62.5% 100%, black 8px, transparent 8px),
+              radial-gradient(circle at 87.5% 100%, black 6px, transparent 6px);
+  -webkit-mask-image: radial-gradient(circle at 12.5% 12px, black 6px, transparent 6px),
+                      radial-gradient(circle at 37.5% 12px, black 10px, transparent 10px),
+                      radial-gradient(circle at 62.5% 12px, black 8px, transparent 8px),
+                      radial-gradient(circle at 87.5% 12px, black 6px, transparent 6px);
+}
+
+.cherries {
+  position: absolute;
+  top: -12px;
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  z-index: 8;
+}
+
+.cherry {
+  width: 24px;
+  height: 24px;
+  background: #dc0000;
+  border-radius: 50%;
+  box-shadow: inset -4px -4px 8px rgba(0,0,0,0.2), 0 2px 10px rgba(220,0,0,0.3);
+  position: relative;
+}
+
+.cherry::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 2px;
+  height: 12px;
+  background: #3a5c1e; /* Stem */
+  border-radius: 2px;
+  transform: rotate(15deg) translateX(-50%);
+}
+
+.racing-stripe {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ferrari-red) 0px,
+    var(--ferrari-red) 16px,
+    transparent 16px,
+    transparent 32px
+  );
+  opacity: 0.8;
+  z-index: 3;
+}
+
+.cake-base.chocolate {
+  width: 260px;
+  height: 8px;
+  background: #2a1b12;
+  border-radius: 100px;
+  margin-top: -1px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+/* Victory State */
+.victory-msg {
+  position: absolute;
+  top: -60px;
+  width: max-content;
+  text-align: center;
+  z-index: 20;
+}
+
+.victory-text {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.12em;
+  background: var(--ferrari-red);
+  padding: 8px 24px;
+  border-radius: 100px;
+  box-shadow: 0 10px 40px rgba(220,0,0,0.4);
+  border: 2px solid rgba(255,255,255,0.2);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.cake-hint {
+  margin-top: 32px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #666;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+
